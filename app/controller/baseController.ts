@@ -7,6 +7,7 @@ export default class BaseController extends Controller {
   success(data: any) {
     this.ctx.body = {
       data,
+      code: 200,
     };
   }
 

@@ -1,4 +1,5 @@
 import { EggAppConfig, EggAppInfo, PowerPartial } from 'egg';
+import path = require('path');
 
 export default (appInfo: EggAppInfo) => {
   const config = {} as PowerPartial<EggAppConfig>;
@@ -42,9 +43,26 @@ export default (appInfo: EggAppInfo) => {
     sourceUrl: `https://github.com/eggjs/examples/tree/master/${appInfo.name}`,
   };
 
+  const userConfig = {
+    static: {
+      prefix: '/',
+      dir: path.join(appInfo.baseDir, 'app/public')
+    },
+    uploadDir: 'app/public/upload',
+    multipart: {
+      /** 文件接收配置 */
+      mode: 'file',
+      cleanSchedule: {
+        cron: '0 0 4 * * *',
+      },
+      fileSize: '100mb',
+      /** 文件接收配置 */
+    }
+  }
   // the return config will combines to EggAppConfig
   return {
     ...config,
     ...bizConfig,
+    ...userConfig,
   };
 };
