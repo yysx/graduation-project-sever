@@ -8,4 +8,5 @@ export const RECORDS_TYPE = [
   'release',
   'collect',
   'scan',
+  'sold',
 ]

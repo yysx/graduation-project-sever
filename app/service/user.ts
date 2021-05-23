@@ -1,5 +1,8 @@
 import { Service } from 'egg';
 import { md5 } from 'utility';
+import mongoose = require('mongoose');
+
+const ObjectId = mongoose.Types.ObjectId;
 
 export default class Test extends Service {
   // 用户登录
@@ -38,13 +41,11 @@ export default class Test extends Service {
   async getRecords(data: any) {
     const { type } = data;
     const { authorization } = this.ctx.header;
-    console.log(type);
-    console.log(authorization);
     return await this.ctx.model.Records.aggregate([
       {
         $match: {
           userID: authorization,
-          type
+          type,
         }
       },
       {
@@ -69,10 +70,19 @@ export default class Test extends Service {
           goods: {
             pageviews: 0,
             message: 0,
-            userID: 0,
             __v: 0,
           }
         }
+      },
+      {
+        $match: {
+          status: { $ne: 'close' }
+        }
+      },
+      {
+        $addFields: {
+          userid: { $toObjectId: "$goods.userID" },
+        },
       },
       {
         $lookup: {
@@ -100,5 +110,40 @@ export default class Test extends Service {
         }
       }
     ])
+  }
+
+  // 增加记录
+  async addRecords({ authorization, ...data }: any) {
+    await this.ctx.model.Records.create({
+      userID: authorization,
+      ...data,
+    })
+    return;
+  }
+
+  // 修改记录
+  async updateRecords({ authorization, type, goodID, status }) {
+    await this.ctx.model.Records.updateOne({
+      userID: authorization,
+      goodID,
+      type,
+    }, {
+      status,
+    })
+
+  }
+
+  // 修改用户信息
+  async updateUser({ authorization, password, ...data }) {
+    if (password) {
+      password = md5(password);
+      return await this.ctx.model.User.updateOne({
+        _id: ObjectId(authorization),
+      }, { password, ...data });
+    } else {
+      return await this.ctx.model.User.updateOne({
+        _id: ObjectId(authorization),
+      }, data);
+    }
   }
 }

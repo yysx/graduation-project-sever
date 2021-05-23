@@ -3,12 +3,14 @@
 
 import 'egg';
 import ExportGoods from '../../../app/model/goods';
+import ExportMessages from '../../../app/model/messages';
 import ExportRecords from '../../../app/model/records';
 import ExportUser from '../../../app/model/user';
 
 declare module 'egg' {
   interface IModel {
     Goods: ReturnType<typeof ExportGoods>;
+    Messages: ReturnType<typeof ExportMessages>;
     Records: ReturnType<typeof ExportRecords>;
     User: ReturnType<typeof ExportUser>;
   }

@@ -162,7 +162,6 @@ export const THIRD_TYPE = [
 
 export const GOOD_STATUS = [
   'onSale',
-  'paying',
   'done',
   'revoked',
 ]

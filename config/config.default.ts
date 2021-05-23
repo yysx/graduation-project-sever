@@ -38,6 +38,16 @@ export default (appInfo: EggAppInfo) => {
     },
   };
 
+  config.io = {
+    init: {},
+    namespace: {
+      '/': {
+        connectionMiddleware: ['auth'],
+        packetMiddleware: [],
+      },
+    },
+  };
+
   // add your special config in here
   const bizConfig = {
     sourceUrl: `https://github.com/eggjs/examples/tree/master/${appInfo.name}`,

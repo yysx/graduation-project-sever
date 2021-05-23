@@ -1,5 +1,7 @@
 import Controller from './baseController';
+import mongoose = require('mongoose');
 
+const ObjectId = mongoose.Types.ObjectId;
 export default class HomeController extends Controller {
   // 用户登录
   async userLogin() {
@@ -27,11 +29,71 @@ export default class HomeController extends Controller {
     this.success({});
   }
 
+  // 修改记录
+  async updateRecords() {
+    const { authorization } = this.ctx.header;
+    const { isCollect = false, type, goodID } = this.ctx.request.body;
+    if (type === 'collect' && isCollect) {
+      await this.ctx.service.user.updateRecords({ authorization, type, goodID, status: 'close' });
+    }
+    if (type === 'collect' && !isCollect) {
+      const recordData = await this.ctx.model.Records.find({
+        goodID,
+        userID: authorization,
+        type: 'collect',
+      })
+      if (recordData.length === 0) {
+        await this.ctx.service.user.addRecords({ authorization, type, goodID });
+      } else {
+        await this.ctx.service.user.updateRecords({ authorization, type, goodID, status: 'open' });
+      }
+    }
+    this.success({});
+  }
+
   // 获取记录
   async getRecords() {
     const data = this.ctx.request.query;
     const res = await this.ctx.service.user.getRecords(data);
-    console.log(res);
     this.success(res);
+  }
+
+  // 删除记录
+  async deleteRecords() {
+    const { _id } = this.ctx.request.body;
+    await this.ctx.model.Records.updateOne({
+      _id: ObjectId(_id)
+    }, { status: 'close' });
+    this.success({});
+  }
+
+  // 获取用户信息
+  async getUser() {
+    const { authorization } = this.ctx.header;
+    const [userData] = await this.ctx.model.User.aggregate([
+      {
+        $match: {
+          _id: ObjectId(authorization),
+        }
+      }, {
+        $project: {
+          password: 0
+        }
+      }
+    ])
+    this.success(userData);
+  }
+
+  // 修改用户信息
+  async updateUser() {
+    const data = this.ctx.request.body;
+    const { authorization } = this.ctx.header;
+    const res = await this.ctx.service.user.updateUser({ authorization, ...data });
+    if (res.ok === 1) {
+      this.success({});
+    } else {
+      this.error(500, '未知错误');
+    }
+
   }
 }

@@ -13,6 +13,10 @@ const plugin: EggPlugin = {
     enable: true,
     package: 'egg-validate',
   },
+  io: {
+    enable: true,
+    package: 'egg-socket.io',
+  }
 };
 
 export default plugin;

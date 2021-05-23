@@ -11,7 +11,7 @@ export default (app: any) => {
     email: { type: String, unique: true, require: true },
     avatarAddr: { type: String },
     coinNum: { type: Number, default: 0, require: true },
-    address: { type: String },
+    address: { type: String, default: '', require: true },
     certificationStatus: { type: String, enum: CERTIFICATION_STATUS, default: 'notSubmit', require: true },
     realName: { type: String },
     IDNumber: { type: String },
